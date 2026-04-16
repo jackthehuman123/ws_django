@@ -1,15 +1,11 @@
-from channels.generic.websocket import WebsocketConsumer
-import json
+from channels.generic.websocket import AsyncWebsocketConsumer
 
-class EchoConsumer(WebsocketConsumer):
-    def connect(self):
-        print("[connect]", self.scope["client"])
-        self.accept()
+class EchoConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.accept()
+        
+    async def receive(self, text_data):
+        await self.send(text_data=text_data)
 
-    def receive(self, text_data):
-        data = json.loads(text_data)
-        print("[receive]", data)
-        self.send(text_data=text_data)
-
-    def disconnect(self, close_code):
-        print("[disconnect]", close_code)
+    async def disconnect(self, code):
+        return await super().disconnect(code)    
