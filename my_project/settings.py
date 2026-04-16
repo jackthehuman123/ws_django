@@ -41,6 +41,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+CHANNEL_LAYERS = {
+    "default": {
+        #? channels use RAM to store group information
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    }
+}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
