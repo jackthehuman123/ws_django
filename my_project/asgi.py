@@ -17,7 +17,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'my_project.settings')
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
-    "websocket": URLRouter(websocket_urlpatterns)
+    "websocket": URLRouter(websocket_urlpatterns),
 })
 
 #? ProtocolTypeRouter: Store what kind of connection we want our server to response to using a dictionary.
