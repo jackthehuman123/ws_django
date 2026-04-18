@@ -1,4 +1,7 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
+from .models import Message
+import json
 
 class EchoConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -23,12 +26,21 @@ class RoomConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         #? Send message to the group
+        data = json.loads(text_data)
+        message = data["message"]
+
+        #* Persist to Postgres (ORM is sync)
+        await database_sync_to_async(Message.objects.create) (
+            room = self.room_name,
+            content=message
+        )
+
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 "type": "chat.message", #? calls the handler (chat_message)
                 #? data to be sent
-                "text": text_data,
+                "message": message,
                 # "name": "alice",
                 # ...
             }
