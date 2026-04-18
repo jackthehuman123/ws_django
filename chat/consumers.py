@@ -19,6 +19,7 @@ class RoomConsumer(AsyncWebsocketConsumer):
         #? Add channel to group (self.channel_name belongs to the connection)
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
+        print(f"[connect] channel_name = {self.channel_name}")
 
     async def receive(self, text_data):
         #? Send message to the group
