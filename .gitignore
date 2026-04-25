@@ -1,24 +1,24 @@
 # Python
-backend/.venv/
-backend/__pycache__/
-backend/**/__pycache__/
-backend/*.pyc
-backend/*.pyo
-backend/*.pyd
-backend/.env
-backend/db.sqlite3
-backend/staticfiles/
-backend/media/
+.venv/
+ws_django/__pycache__/
+ws_django/**/__pycache__/
+ws_django/*.pyc
+ws_django/*.pyo
+ws_django/*.pyd
+ws_django/.env
+ws_django/db.sqlite3
+ws_django/staticfiles/
+ws_django/media/
 
 # Django migrations (optional, some teams commit these)
-# backend/**/migrations/
+# ws_django/**/migrations/
 
 # Node
-frontend/node_modules/
-frontend/dist/
-frontend/.env
-frontend/.env.local
-frontend/.env.production
+ws_react/node_modules/
+ws_react/dist/
+ws_react/.env
+ws_react/.env.local
+ws_react/.env.production
 
 # Docker
 *.log
