@@ -2,46 +2,75 @@ import { useEffect, useRef, useState, useCallback } from "react";
 
 export function useWebSocket(roomId) {
   const [messages, setMessages] = useState([]);
+  // "connecting" | "open" | "disconnected"
+  const [status, setStatus] = useState("disconnected");
   const wsRef = useRef(null);
+  const retryDelay = useRef(1000); // ms
+  const retryTimer = useRef(null);
+  const shouldReconnect = useRef(true);
 
   useEffect(() => {
     if (!roomId) return;
 
-    const ws = new WebSocket(`ws://localhost:5173/ws/chat/${roomId}/`);
-    wsRef.current = ws;
+    shouldReconnect.current = true;
+    retryDelay.current = 1000;
 
-    ws.onopen = () => {
-      console.log(`[ws] connected to room: ${roomId}`);
-    };
+    function connect() {
+      setStatus("connecting");
+      const ws = new WebSocket(`ws://localhost:5173/ws/chat/${roomId}/`);
+      wsRef.current = ws;
 
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log("[ws] received: ", data);
+      ws.onopen = () => {
+        setStatus("open");
+        retryDelay.current = 1000;
+        console.log(`[ws] connected to room: ${roomId}`);
+      };
 
-      if (data.type === "history") {
-        // Replace message list with history from server
-        setMessages(data.messages);
-      } else if (data.type === "chat.message") {
-        // Append live message
-        setMessages(prev => [...prev, {
-          body: data.message,
-          sender: data.sender,
-          timestamp: new Date().toISOString(),
-        }]);
-      }
-    };
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log("[ws] received: ", data);
 
-    ws.onclose = (event) => {
-      console.log(`[ws] closed: code=${event.code}`);
-    };
+        if (data.type === "history") {
+          // Replace message list with history from server
+          setMessages(data.messages);
+        } else if (data.type === "chat.message") {
+          // Append live message
+          setMessages((prev) => [
+            ...prev,
+            {
+              body: data.message,
+              sender: data.sender,
+              timestamp: new Date().toISOString(),
+            },
+          ]);
+        }
+      };
 
-    ws.onerror = (error) => {
-      console.log("[ws] error:", error);
-    };
+      ws.onclose = (event) => {
+        setStatus("disconnected");
+        if (!shouldReconnect.current) return;
+
+        console.log(`[ws] closed. Retrying in ${retryDelay.current} ms...`);
+        retryTimer.current = setTimeout(() => {
+          retryDelay.current = Math.min(retryDelay.current * 2, 30000);
+          connect();
+        }, retryDelay.current);
+      };
+
+      ws.onerror = (error) => {
+        console.log("[ws] error:", error);
+        ws.close();
+      };
+    }
+
+    connect();
 
     // Cleanup: close connection when roomId changes or components unmounts
     return () => {
-      ws.close();
+      //? Since we are calling ws.close(), we need to clear retry states
+      shouldReconnect.current = false;
+      clearTimeout(retryTimer.current);
+      wsRef.current?.close();
     };
   }, [roomId]);
 
@@ -51,5 +80,5 @@ export function useWebSocket(roomId) {
     }
   }, []);
 
-  return { messages, send };
+  return { messages, send, status };
 }
