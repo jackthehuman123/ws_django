@@ -67,7 +67,7 @@ class RoomConsumer(AsyncWebsocketConsumer):
         user = self.scope["user"]
 
         #* Persist to Postgres (ORM is sync)
-        await database_sync_to_async(Message.objects.create) (
+        msg = await database_sync_to_async(Message.objects.create) (
             room = self.room_obj[0],
             sender=user,
             body=message,
@@ -84,6 +84,7 @@ class RoomConsumer(AsyncWebsocketConsumer):
                 #? data to be sent
                 "message": message,
                 "sender": user.username,
+                "timestamp": msg.timestamp.isoformat(),
                 # "name": "alice",
                 # ...
             }
@@ -94,7 +95,8 @@ class RoomConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             "type": "chat.message",
             "message": event["message"],
-            "sender": event["sender"]
+            "sender": event["sender"],
+            "timestamp": event["timestamp"]
         }))
 
     async def disconnect(self, code):

@@ -40,7 +40,7 @@ export function useWebSocket(roomId) {
             {
               body: data.message,
               sender: data.sender,
-              timestamp: new Date().toISOString(),
+              timestamp: data.timestamp,
             },
           ]);
         }
