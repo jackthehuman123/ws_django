@@ -48,7 +48,7 @@ class RoomConsumer(AsyncWebsocketConsumer):
             )
 
         messages = await database_sync_to_async(get_messages)()
-
+        messages.reverse()
         history = [
             {
                 "body": m.body,

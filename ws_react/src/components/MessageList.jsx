@@ -3,6 +3,15 @@ import { useEffect, useRef } from "react";
 export default function MessageList({ messages }) {
   const bottomRef = useRef(null);
   const containerRef = useRef(null);
+  // Jump to bottom when history first loads
+  const hasScrolledToBottom = useRef(false);
+
+  useEffect(() => {
+    if (messages.length > 0 && !hasScrolledToBottom.current) {
+      bottomRef.current?.scrollIntoView({ behavior: "instant" });
+      hasScrolledToBottom.current = true;
+    }
+  }, [messages]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -49,11 +58,11 @@ export default function MessageList({ messages }) {
             {new Date(msg.timestamp).toLocaleTimeString()}
           </span>
           <p style={{ margin: "4px 0 0 " }}>{msg.body}</p>
-          {msg.pending && (
+          {/* {msg.pending && (
             <span style={{ fontSize: "0.75em", color: "#aaa" }}>
               (sending...)
             </span>
-          )}
+          )} */}
         </div>
       ))}
       <div ref={bottomRef} />
