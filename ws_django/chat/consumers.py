@@ -44,7 +44,7 @@ class RoomConsumer(AsyncWebsocketConsumer):
             return list(
                 Message.objects.filter(room=self.room_obj[0])
                 .select_related("sender")
-                .order_by("timestamp")[:50]
+                .order_by("-timestamp")[:50]
             )
 
         messages = await database_sync_to_async(get_messages)()
