@@ -35,6 +35,8 @@ export default function MessageList({ messages }) {
         <div
           key={i}
           style={{
+            opacity: msg.pending ? 0.6 : 1,
+            fontStyle: msg.pending ? "italic" : "normal",
             padding: "4px 8px",
             background: "#1f1f1f",
             borderRadius: "4px",
@@ -47,6 +49,11 @@ export default function MessageList({ messages }) {
             {new Date(msg.timestamp).toLocaleTimeString()}
           </span>
           <p style={{ margin: "4px 0 0 " }}>{msg.body}</p>
+          {msg.pending && (
+            <span style={{ fontSize: "0.75em", color: "#aaa" }}>
+              (sending...)
+            </span>
+          )}
         </div>
       ))}
       <div ref={bottomRef} />

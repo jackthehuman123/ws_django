@@ -1,6 +1,9 @@
-from django.shortcuts import render
 from django.http import JsonResponse
 from .models import Message, Room
+
+def rooms_view(request):
+    rooms = list(Room.objects.values_list("name", flat=True))
+    return JsonResponse({"rooms": rooms})
 
 def room_history(request, room_name):
     try:

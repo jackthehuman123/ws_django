@@ -1,4 +1,11 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  startTransition,
+} from "react";
+import { useOptimistic } from "react";
 
 export function useWebSocket(roomId) {
   const [messages, setMessages] = useState([]);
@@ -8,6 +15,33 @@ export function useWebSocket(roomId) {
   const retryDelay = useRef(1000); // ms
   const retryTimer = useRef(null);
   const shouldReconnect = useRef(true);
+
+  //? Uncomment for exercise 8
+  // const [optimisticMessages, addOptimisticMessage] = useOptimistic(
+  //   messages,
+  //   (state, newMessage) => [...state, newMessage],
+  // );
+
+  //? Uncomment for exercise 8
+  // const send = useCallback(
+  //   (messageText, senderUsername) => {
+  //     // Optimistically add to UI immediately
+  //     startTransition(() => {
+  //       addOptimisticMessage({
+  //         body: messageText,
+  //         sender: senderUsername,
+  //         timestamp: new Date().toISOString(), //! Browser vs Server clock (clock skew)
+  //         pending: true, // flag for styling
+  //       });
+  //     });
+
+  //     // Send over WebSocket - server will echo back, which updates "messages"
+  //     if (wsRef.current?.readyState === WebSocket.OPEN) {
+  //       wsRef.current.send(JSON.stringify({ message: messageText }));
+  //     }
+  //   },
+  //   [addOptimisticMessage],
+  // );
 
   useEffect(() => {
     if (!roomId) return;

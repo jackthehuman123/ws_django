@@ -3,6 +3,8 @@ from channels.db import database_sync_to_async
 from .models import Message, Room
 import json
 
+import asyncio
+
 class EchoConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
@@ -76,7 +78,7 @@ class RoomConsumer(AsyncWebsocketConsumer):
         #? The event loop is single threaded, if a blocking io operation (writing to a db synchronously) runs
         #? the event loop would be paused, disrupting websocket's behavior.
         # Message.objects.create(room=self.room_name, content=message)
-
+        
         await self.channel_layer.group_send(
             self.room_group_name,
             {
